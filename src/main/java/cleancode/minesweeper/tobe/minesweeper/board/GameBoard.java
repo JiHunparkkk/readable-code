@@ -11,6 +11,7 @@ import cleancode.minesweeper.tobe.minesweeper.board.position.CellPositions;
 import cleancode.minesweeper.tobe.minesweeper.board.position.RelativePosition;
 import cleancode.minesweeper.tobe.minesweeper.gamelevel.GameLevel;
 import java.util.List;
+import java.util.Stack;
 
 public class GameBoard {
 
@@ -47,7 +48,7 @@ public class GameBoard {
             return;
         }
 
-        openSurroundedCells(cellPosition);
+        openSurroundedCells2(cellPosition);
         checkIfGameIsOver();
     }
 
@@ -62,8 +63,7 @@ public class GameBoard {
         int rowSize = getRowSize();
         int colSize = getColSize();
 
-        return cellPosition.isRowIndexMoreThanOrEqual(rowSize)
-                || cellPosition.isColIndexMoreThanOrEqual(colSize);
+        return cellPosition.isRowIndexMoreThanOrEqual(rowSize) || cellPosition.isColIndexMoreThanOrEqual(colSize);
     }
 
     public boolean isInProgress() {
@@ -126,37 +126,64 @@ public class GameBoard {
         int colSize = getColSize();
 
         long count = calculateSurroundedPositions(cellPosition, rowSize, colSize).stream()
-                .filter(this::isLandMineCellAt)
-                .count();
+                .filter(this::isLandMineCellAt).count();
 
         return (int) count;
     }
 
     private List<CellPosition> calculateSurroundedPositions(CellPosition cellPosition, int rowSize, int colSize) {
-        return RelativePosition.SURROUNDED_POSITIONS.stream()
-                .filter(cellPosition::canCalculatePositionBy)
-                .map(cellPosition::calculatePositionBy)
-                .filter(position -> position.isRowIndexLessThan(rowSize))
-                .filter(position -> position.isColIndexLessThan(colSize))
-                .toList();
+        return RelativePosition.SURROUNDED_POSITIONS.stream().filter(cellPosition::canCalculatePositionBy)
+                .map(cellPosition::calculatePositionBy).filter(position -> position.isRowIndexLessThan(rowSize))
+                .filter(position -> position.isColIndexLessThan(colSize)).toList();
     }
 
-    private void openSurroundedCells(CellPosition cellPosition) {
-        if (isOpenedCell(cellPosition)) {
+//    private void openSurroundedCells(CellPosition cellPosition) {
+//        if (isOpenedCell(cellPosition)) {
+//            return;
+//        }
+//        if (isLandMineCellAt(cellPosition)) {
+//            return;
+//        }
+//
+//        openOneCellAt(cellPosition);
+//
+//        if (doesCellHaveLandMineCount(cellPosition)) {
+//            return;
+//        }
+//
+//        List<CellPosition> cellPositions = calculateSurroundedPositions(cellPosition, getRowSize(), getColSize());
+//        cellPositions.forEach(this::openSurroundedCells);
+//    }
+
+    private void openSurroundedCells2(CellPosition cellPosition) {
+        Stack<CellPosition> stack = new Stack<>();
+        stack.push(cellPosition);
+
+        while (!stack.isEmpty()) {
+            openAndPushCellAt(stack);
+        }
+    }
+
+    private void openAndPushCellAt(Stack<CellPosition> stack) {
+        CellPosition currentCellPosition = stack.pop();
+        if (isOpenedCell(currentCellPosition)) {
             return;
         }
-        if (isLandMineCellAt(cellPosition)) {
+        if (isLandMineCellAt(currentCellPosition)) {
             return;
         }
 
-        openOneCellAt(cellPosition);
+        openOneCellAt(currentCellPosition);
 
-        if (doesCellHaveLandMineCount(cellPosition)) {
+        if (doesCellHaveLandMineCount(currentCellPosition)) {
             return;
         }
 
-        List<CellPosition> cellPositions = calculateSurroundedPositions(cellPosition, getRowSize(), getColSize());
-        cellPositions.forEach(this::openSurroundedCells);
+        List<CellPosition> surroundedPositions = calculateSurroundedPositions(currentCellPosition, getRowSize(),
+                getColSize());
+        for (CellPosition surroundedPosition : surroundedPositions) {
+            stack.push(surroundedPosition);
+        }
     }
 
     private boolean isOpenedCell(CellPosition cellPosition) {
