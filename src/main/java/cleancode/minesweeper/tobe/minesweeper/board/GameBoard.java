@@ -183,17 +183,17 @@ public class GameBoard {
         }
     }
 
+    private boolean isAllCellChecked() {
+        Cells cells = Cells.from(board);
+        return cells.isAllChecked();
+    }
+
     private void changeGameStatusToWin() {
         gameStatus = GameStatus.WIN;
     }
 
     private void changeGameStatusToLose() {
         gameStatus = GameStatus.LOSE;
-    }
-
-    private boolean isAllCellChecked() {
-        Cells cells = Cells.from(board);
-        return cells.isAllChecked();
     }
 
     private Cell findCell(CellPosition cellPosition) {
