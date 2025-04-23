@@ -2,7 +2,6 @@ package cleancode.studycafe.asis.io;
 
 import cleancode.studycafe.asis.model.StudyCafeLockerPass;
 import cleancode.studycafe.asis.model.StudyCafePass;
-
 import java.util.List;
 
 public class OutputHandler {
@@ -40,6 +39,10 @@ public class OutputHandler {
 
         System.out.println(askMessage);
         System.out.println("1. 예 | 2. 아니오");
+    }
+
+    public void showPassOrderSummary(StudyCafePass selectedPass) {
+        showPassOrderSummary(selectedPass, null);
     }
 
     public void showPassOrderSummary(StudyCafePass selectedPass, StudyCafeLockerPass lockerPass) {
